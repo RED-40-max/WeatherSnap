@@ -1,86 +1,53 @@
-import { geocodeCity, fetchForecast } from "./api.js";
-import { safeCity, formatLocation, takeFirstHours } from "./utils.js";
+// src/api.js
 
-const cityInput = document.getElementById("cityInput");
-const goBtn = document.getElementById("goBtn");
-const statusEl = document.getElementById("status");
-const resultEl = document.getElementById("result");
-const locEl = document.getElementById("loc");
-const tempEl = document.getElementById("temp");
-
-let chart; // Chart.js instance
-
-function setStatus(msg) {
-  statusEl.textContent = msg || "";
-}
-
-function showResult(show) {
-  resultEl.classList.toggle("hidden", !show);
-}
-
-function renderChart(labels, tempVals, feelsVals) {
-    const ctx = document.getElementById("chart");
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          { label: "Temp (°C)", data: tempVals, tension: 0.35 },
-          { label: "Feels like (°C)", data: feelsVals, tension: 0.35 },
-        ],
-      },
-      options: { responsive: true },
-    });
+async function fetchJson(url) {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status} while fetching ${url}`);
+    }
+    return res.json();
   }
 
+  export async function geocodeCity(city) {
 
-/** Always have a working “demo state” even if APIs fail */
-function renderFakeDemo() {
-  const labels = Array.from({ length: 12 }, (_, i) =>
-    dayjs().add(i, "hour").format("ha")
-  );
-  const temps = [20, 21, 22, 22, 23, 24, 24, 23, 22, 21, 21, 20];
 
-  locEl.textContent = "Demo City (XX)";
-  tempEl.textContent = `${temps[0]} °C`;
-  renderChart(labels, temps);
-  showResult(true);
-}
+    const url =
+      `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}` +
+      `&count=5&language=en&format=json`;
 
-async function onGo() {
-  const city = safeCity(cityInput.value) || "Minneapolis";
-  goBtn.disabled = true;
-  setStatus("Loading…");
-  showResult(false);
+      console.log("Geocode URL:", url);
+      const data = await fetchJson(url);
+      console.log("Geocode response:", data);
 
-  try {
-    const geo = await geocodeCity(city);
-    const forecast = await fetchForecast(geo.lat, geo.lon);
+    const hit = data.results?.[0];
+    if (!hit) throw new Error("Place not found — try a city like Tokyo, Osaka, or Sapporo.");
 
-    const { labels, tempVals, feelsVals } = takeFirstHours(forecast);
-    if (values.length === 0) throw new Error("No hourly data returned");
-
-    locEl.textContent = formatLocation(geo);
-    tempEl.textContent = `${values[0]} °C`;
-
-    renderChart(labels, tempVals, feelsVals);
-    showResult(true);
-    setStatus("");
-  } catch (err) {
-    setStatus(`Error: ${err?.message || "Unknown issue"} (showing demo data)`);
-    renderFakeDemo();
-  } finally
-  {
-    goBtn.disabled = false;
+    return {
+      name: hit.name,
+      admin1: hit.admin1,
+      country: hit.country,
+      lat: hit.latitude,
+      lon: hit.longitude,
+    };
   }
-}
 
-goBtn.addEventListener("click", onGo);
-cityInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") onGo();
-});
+  export function takeFirstHours(forecastJson, n = 12) {
+    const times = forecastJson.hourly?.time || [];
+    const temp = forecastJson.hourly?.temperature_2m || [];
+    const feels = forecastJson.hourly?.apparent_temperature || [];
 
-// Start with something that always works
-renderFakeDemo();
+    const k = Math.min(n, times.length, temp.length, feels.length);
+
+    const labels = [];
+    const tempVals = [];
+    const feelsVals = [];
+
+    for (let i = 0; i < k; i++) {
+      labels.push(dayjs(times[i]).format("ha"));
+      tempVals.push(temp[i]);
+      feelsVals.push(feels[i]);
+    }
+
+
+    return { labels, tempVals, feelsVals };
+  }
