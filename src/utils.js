@@ -9,19 +9,22 @@ export function formatLocation(geo) {
   return `${geo.name}${admin} (${geo.country})`;
 }
 
-export function takeFirstHours(forecastJson) {
-  const times = forecastJson.hourly?.time || [];
-  const temps = forecastJson.hourly?.temperature_2m || [];
-  const n = Math.min(CONFIG.MAX_HOURS, times.length, temps.length);
+export function takeFirstHours(forecastJson, n = 12) {
+    const times = forecastJson.hourly?.time || [];
+    const temp = forecastJson.hourly?.temperature_2m || [];
+    const feels = forecastJson.hourly?.apparent_temperature || [];
 
-  const labels = [];
-  const values = [];
+    const k = Math.min(n, times.length, temp.length, feels.length);
 
-  for (let i = 0; i < n; i++) {
-    // dayjs is loaded globally via CDN
-    labels.push(dayjs(times[i]).format("ha"));
-    values.push(temps[i]);
+    const labels = [];
+    const tempVals = [];
+    const feelsVals = [];
+
+    for (let i = 0; i < k; i++) {
+      labels.push(dayjs(times[i]).format("ha"));
+      tempVals.push(temp[i]);
+      feelsVals.push(feels[i]);
+    }
+
+    return { labels, tempVals, feelsVals };
   }
-
-  return { labels, values };
-}

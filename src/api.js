@@ -37,10 +37,25 @@ export async function geocodeCity(city)
 
 
 }
+export async function fetchForecast(lat, lon) {
+    const params = new URLSearchParams({
+      latitude: String(lat),
+      longitude: String(lon),
 
-export async function fetchForecast(lat, long)
-{
-    const url =   `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    `&hourly=temperature_2m&temperature_unit=celsius&timezone=auto`;
-    return fetchJson(url);
-}
+      // Match the Open-Meteo UI selections:
+      hourly: "temperature_2m,apparent_temperature",
+
+      // Use "auto" to get local time for that location (usually best)
+      timezone: "auto",
+
+      // optional but common
+      temperature_unit: "celsius",
+      wind_speed_unit: "kmh",
+      precipitation_unit: "mm",
+    });
+
+    const url = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Forecast failed (${res.status})`);
+    return res.json();
+  }

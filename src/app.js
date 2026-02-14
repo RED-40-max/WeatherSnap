@@ -18,26 +18,23 @@ function showResult(show) {
   resultEl.classList.toggle("hidden", !show);
 }
 
-function renderChart(labels, temps) {
-  const ctx = document.getElementById("chart");
+function renderChart(labels, tempVals, feelsVals) {
+    const ctx = document.getElementById("chart");
+    if (chart) chart.destroy();
 
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels,
-      datasets: [{ label: "Temp (°C)", data: temps, tension: 0.35 }],
-    },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: { ticks: { callback: (v) => `${v}°` } },
+    chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          { label: "Temp (°C)", data: tempVals, tension: 0.35 },
+          { label: "Feels like (°C)", data: feelsVals, tension: 0.35 },
+        ],
       },
-    },
-  });
-}
+      options: { responsive: true },
+    });
+  }
+
 
 /** Always have a working “demo state” even if APIs fail */
 function renderFakeDemo() {
@@ -62,13 +59,13 @@ async function onGo() {
     const geo = await geocodeCity(city);
     const forecast = await fetchForecast(geo.lat, geo.lon);
 
-    const { labels, values } = takeFirstHours(forecast);
+    const { labels, tempVals, feelsVals } = takeFirstHours(forecast);
     if (values.length === 0) throw new Error("No hourly data returned");
 
     locEl.textContent = formatLocation(geo);
     tempEl.textContent = `${values[0]} °C`;
 
-    renderChart(labels, values);
+    renderChart(labels, tempVals, feelsVals);
     showResult(true);
     setStatus("");
   } catch (err) {
