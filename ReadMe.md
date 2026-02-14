@@ -1,22 +1,14 @@
-# 🌦️ Weather Snap
+# Weather Snap
+A tiny demo-first weather dashboard for hackathon practice.
 
-A lightweight, demo-first weather dashboard built for rapid prototyping and hackathon use.
+## Features
+- City -> geocoding -> forecast
+- 12-hour temperature chart
+- No API keys
+- GitHub Pages friendly (no build step)
 
+## Run locally
+Open `index.html` in a browser (or use VS Code Live Server).
 
-## 🌐 Live Demo
-👉 https://red-40-max.github.io/WeatherSnap/
-
-## ⚡ How It Works
-1. User enters a city
-2. App converts city → latitude/longitude (geocoding)
-3. Fetches hourly forecast data
-4. Renders a 12-hour chart with temperature + apparent temperature
-
-## 📦 Deployment
-Deployed via GitHub Pages (no backend required).
-
----
-
-## 🧠 Notes
-- Designed for speed, simplicity, and demo reliability
-- Includes fallback demo data if API fails
+## Deploy to GitHub Pages
+Repo Settings -> Pages -> Deploy from branch -> `main` / `/root`.
