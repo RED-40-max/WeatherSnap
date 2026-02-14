@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Snap</title>
+    <link rel="stylesheet" href="./styles/styles.css" />
+
+    <!-- Pinned dependencies (control deps) -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  </head>
+
+  <body>
+    <main class="card">
+      <header class="header">
+        <h1>🌦️ Weather Snap</h1>
+        <p class="sub">
+          A tiny, demo-first forecast dashboard (geocode → forecast → chart).
+        </p>
+      </header>
+
+      <section class="row">
+        <input id="cityInput" placeholder="Minneapolis" autocomplete="off" />
+        <button id="goBtn">Get Forecast</button>
+      </section>
+
+      <div id="status" class="status" aria-live="polite"></div>
+
+      <section id="result" class="result hidden">
+        <div class="stats">
+          <div>
+            <div class="label">Location</div>
+            <div id="loc" class="value"></div>
+          </div>
+          <div>
+            <div class="label">Temp (first hour)</div>
+            <div id="temp" class="value"></div>
+          </div>
+        </div>
+
+        <div class="chartWrap">
+          <canvas id="chart" height="120"></canvas>
+        </div>
+      </section>
+
+      <footer class="foot">
+        Powered by Open-Meteo (no API key). Built for hackathon practice.
+      </footer>
+    </main>
+
+    <!-- IMPORTANT: module mode for GitHub Pages + imports -->
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

@@ -1,22 +1,14 @@
+# Weather Snap
+A tiny demo-first weather dashboard for hackathon practice.
 
-weather-snap/
-│
-├── index.html
-├── README.md
-├── .gitignore
-│
-├── /src
-│   ├── app.js -> UI event handling
-│   ├── api.js -> fetch calls
-│   ├── utils.js -> data parsing, formatting
-│   └── config.js -> constants
-│
-├── /styles
-│   └── styles.css
-│
-├── /assets
-│   ├── icons/
-│   └── images/
-│
-└── /docs -> demo + arcitecture nodes
-    └── demo-notes.md
+## Features
+- City -> geocoding -> forecast
+- 12-hour temperature chart
+- No API keys
+- GitHub Pages friendly (no build step)
+
+## Run locally
+Open `index.html` in a browser (or use VS Code Live Server).
+
+## Deploy to GitHub Pages
+Repo Settings -> Pages -> Deploy from branch -> `main` / `/root`.
